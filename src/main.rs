@@ -3,6 +3,7 @@ use macroquad::color::{GREEN, WHITE, RED};
 use macroquad::input::{KeyCode, is_key_pressed};
 
 use macroquad::shapes::draw_rectangle;
+use macroquad::telemetry::scene_allocated_memory;
 use macroquad::text::draw_text;
 use macroquad::time::get_frame_time;
 use macroquad::window::{clear_background, next_frame, screen_height, screen_width};
@@ -44,8 +45,6 @@ impl Snake {
 
 		self.apple.0 = (((rng.gen_range(0 .. self.frame.0 as i32) )/25)*25) as f32 ;
 		self.apple.1 = (((rng.gen_range(25.. self.frame.1 as i32) )/25)*25) as f32 ;
-
-		println!("{:.2}",self.apple.0);
 	}
 }
 
@@ -74,8 +73,8 @@ async fn main(){
 
 			snake.head.0 += snake.direction.0;
 			snake.head.1 += snake.direction.1;
-
-			println!("c modifié ");
+			
+			
 			snake.body.push_back(snake.head);
 		}
 
@@ -88,18 +87,20 @@ async fn main(){
 		
 		clear_background(WHITE);
 
-		if snake.head == snake.apple {        
-			snake.score += 1;
-			
+		if snake.head == snake.apple {
 			snake.add_point();
 			snake.new_apple();
+		}
+		else if snake.body.len() > snake.score as usize +1 {
+			snake.body.pop_front();
 		}
 
 		draw_text     (snake.score.to_string(),50., 50., 10.0, GREEN);
 
 		draw_rectangle(snake.apple.0 , snake.apple.1, CELL, CELL, RED  );
-		draw_rectangle(snake.head.0  , snake.head.1 , CELL, CELL, GREEN);
-		
+		for block in &snake.body{
+			draw_rectangle(block.0  , block.1 , CELL, CELL, GREEN);
+		}
 
 		
 		
