@@ -3,6 +3,14 @@
 version = 4
 
 [[package]]
+name = "RuSnake"
+version = "0.1.0"
+dependencies = [
+ "macroquad",
+ "rand",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -329,14 +337,6 @@ name = "simd-adler32"
 version = "0.3.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a219298ac11a56ea9a6d2120044824d6f01aeb034955e7af7bc16858527deea"
-
-[[package]]
-name = "snake"
-version = "0.1.0"
-dependencies = [
- "macroquad",
- "rand",
-]
 
 [[package]]
 name = "syn"
