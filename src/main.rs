@@ -3,10 +3,12 @@ use macroquad::color::{GREEN, WHITE, RED};
 use macroquad::input::{KeyCode, is_key_pressed};
 use macroquad::shapes::draw_rectangle;
 use macroquad::text::draw_text;
+use macroquad::ui::{hash, root_ui,widgets};
 use macroquad::time::get_frame_time;
 use macroquad::window::{clear_background, next_frame, screen_height, screen_width};
 use std::collections::VecDeque;
-use rand::Rng;
+use macroquad::prelude::*;
+use macroquad::rand::gen_range;
 
 struct Snake{
 	direction : (f32, f32),
@@ -47,17 +49,40 @@ impl Snake{
 	}
 
 	fn new_apple(&mut self){
-		let mut rng = rand::thread_rng(); 
-
-		self.apple.0 = (((rng.gen_range(0 .. self.frame.0 as i32) )/25)*25) as f32 ;
-		self.apple.1 = (((rng.gen_range(25.. self.frame.1 as i32) )/25)*25) as f32 ;
+		self.apple.0 = ((gen_range(0 , self.frame.0 as i32)/25)*25) as f32 ;
+		self.apple.1 = ((gen_range(25, self.frame.1 as i32)/25)*25) as f32 ;
 	}
 }
 
 #[macroquad::main("snake")]
 async fn main(){
+	let snake = Snake::new();
+	main_menu(snake).await;
+}
 
-	let mut snake = Snake::new();
+async fn main_menu( mut snake: Snake){
+
+	let mut play_clicked = false;
+
+	widgets::Button::new("Play").position(vec2(65.0, 15.0)) ;
+	loop{
+		clear_background(WHITE);
+		root_ui().window(hash!(), vec2(screen_width( ) / 2. - 100., 150.), vec2(200., 250.), |ui| {
+			ui.label(None, "Snake");
+			if ui.button(None, "Play"){ play_clicked = true; }
+			if ui.button(None, "Exit"){ std::process::exit(0)      ;}
+		});
+
+		if play_clicked {
+			game_loop(&mut snake).await;
+		}
+
+		next_frame().await;
+	}
+}
+
+async fn game_loop(snake_in: &mut Snake){
+	let mut snake = snake_in;
 	let mut chrono = 0. ;
 
 	snake.frame = (screen_width(), screen_height()); 
@@ -113,7 +138,6 @@ async fn main(){
 
 		next_frame().await;
 	}
-
 }
 
 // retourne vrai si la direction voulue est l'opposé de l'actuelle
