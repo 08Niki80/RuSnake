@@ -1,5 +1,4 @@
 use macroquad::color::{GREEN, WHITE, RED};
-
 use macroquad::input::{KeyCode, is_key_pressed};
 use macroquad::shapes::draw_rectangle;
 use macroquad::text::draw_text;
@@ -7,7 +6,6 @@ use macroquad::ui::{hash, root_ui};
 use macroquad::time::get_frame_time;
 use macroquad::window::{clear_background, next_frame, screen_height, screen_width};
 use std::collections::VecDeque;
-use std::process::exit;
 use macroquad::prelude::*;
 use macroquad::rand::gen_range;
 
@@ -66,10 +64,10 @@ async fn main_menu(){
 	let mut play_clicked = false;
 	loop{
 		clear_background(WHITE);
-		root_ui().window(hash!(), vec2(screen_width( ) / 2. - 100., 150.), vec2(200., 250.), |ui| {
-			ui.label(None, "Snake");
-			if ui.button(None, "Play"){ play_clicked = true; }
-			if ui.button(None, "Exit"){ std::process::exit(0)      ;}
+		root_ui().window(hash!(), vec2(0., 0.), vec2(screen_width(), screen_height()), |ui| {
+			ui.label(vec2(screen_width()/2. - 15., 150.),     "Snake");
+			if ui.button(vec2(screen_width()/2. - 12., 175.), "Play"){ play_clicked = true; }
+			if ui.button(vec2(screen_width()/2. - 12., 200.), "Exit"){ std::process::exit(0)      ;}
 		});
 
 		if play_clicked {
