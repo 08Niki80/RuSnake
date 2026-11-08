@@ -3,10 +3,11 @@ use macroquad::color::{GREEN, WHITE, RED};
 use macroquad::input::{KeyCode, is_key_pressed};
 use macroquad::shapes::draw_rectangle;
 use macroquad::text::draw_text;
-use macroquad::ui::{hash, root_ui,widgets};
+use macroquad::ui::{hash, root_ui};
 use macroquad::time::get_frame_time;
 use macroquad::window::{clear_background, next_frame, screen_height, screen_width};
 use std::collections::VecDeque;
+use std::process::exit;
 use macroquad::prelude::*;
 use macroquad::rand::gen_range;
 
@@ -26,11 +27,11 @@ impl Snake{
 	fn new() -> Self {
 		Snake {
 			direction : (0., 25.),
-			body  : VecDeque::new(),
-			head  : (0., 0.),
-			apple : (0., 0.),
-			score :  0,
-			frame : (0., 0.)
+			body      : VecDeque::new(),
+			head      : (0., 0.),
+			apple     : (0., 0.),
+			score     :  0,
+			frame     : (0., 0.)
 		}
 	}
 
@@ -56,15 +57,13 @@ impl Snake{
 
 #[macroquad::main("snake")]
 async fn main(){
-	let snake = Snake::new();
-	main_menu(snake).await;
+	main_menu().await;
 }
 
-async fn main_menu( mut snake: Snake){
+async fn main_menu(){
+	let mut max_score:i32 = 0;
 
 	let mut play_clicked = false;
-
-	widgets::Button::new("Play").position(vec2(65.0, 15.0)) ;
 	loop{
 		clear_background(WHITE);
 		root_ui().window(hash!(), vec2(screen_width( ) / 2. - 100., 150.), vec2(200., 250.), |ui| {
@@ -74,15 +73,18 @@ async fn main_menu( mut snake: Snake){
 		});
 
 		if play_clicked {
-			game_loop(&mut snake).await;
+			max_score = game_loop().await;
+			play_clicked = false;
 		}
 
 		next_frame().await;
 	}
 }
 
-async fn game_loop(snake_in: &mut Snake){
-	let mut snake = snake_in;
+
+async fn game_loop() -> i32{
+
+	let mut snake = Snake::new();
 	let mut chrono = 0. ;
 
 	snake.frame = (screen_width(), screen_height()); 
@@ -110,9 +112,17 @@ async fn game_loop(snake_in: &mut Snake){
 			snake.head.0 += snake.direction.0;
 			snake.head.1 += snake.direction.1;
 
-			collision   (&snake.head, &snake.body);
 			pomme_touche(&mut snake);
-			sortie      (&snake.frame, &snake.head);
+
+			if 	collision   (&snake.head, &snake.body) | 
+				sortie      (&snake.frame, &snake.head){
+				
+				return snake.score;
+				
+			}
+
+				
+
 			snake.body.push_front(snake.head);
 		}
 
